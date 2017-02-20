@@ -1,0 +1,208 @@
+﻿@{
+    Common.Auth _auth = new Common.Auth((Common.Model.BorrowerWithUser) Session["User"]);
+}
+<!DOCTYPE html>
+<html lang="en" ng-app="MurvasApp">
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>@ViewBag.Title - Murvas Bokhandel</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link href="~/Content/sb-admin.css" rel="stylesheet" />
+
+    <!-- Morris Charts CSS -->
+    <link href="~/Content/plugins/morris.css" rel="stylesheet" />
+
+    <!-- Custom Fonts -->
+    <link href="~/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+        <!-- Navigation -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+
+                <p style="padding:5px;">
+                    <a href="/">
+                        <img border="0" alt="" src="~/Images/Murvas.png" width="160" height="50">
+                    </a>
+                </p>
+            </div>
+            <div class="nav navbar-left top-nav">
+                <form class="nav" name="SearchBar" method="get" action="/Public/Search" style="margin-top:7px;">
+                    <div class="form-inline">
+                        <input type="text" class="form-control" name="search_field" placeholder="Sök..." />
+                        <input class="btn btn-default" value="Sök" type="submit" />
+                    </div>
+                </form>
+            </div>
+            <div class="nav navbar-nav top-nav">
+                <ul class="nav navbar-nav top-nav">
+                    <li>
+                        <a href="/Public/BrowseAuthor"><i class="fa fa-list"></i> Författare</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav top-nav">
+                    <li>
+                        <a href="/Public/BrowseBook"><i class="fa fa-list"></i> Böcker </a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Top Menu Items -->
+            <ul class="nav navbar-right top-nav">
+                @if (_auth.HasUserPermission())
+                {
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">@_auth.LoggedInUser.Borrower.FirstName @_auth.LoggedInUser.Borrower.LastName<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            @*<li>
+                                <a href="#"><i class="fa fa-fw fa-user"></i> Författare</a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-fw fa-users"></i> Låntagare</a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-fw fa-book"></i> Böcker</a>
+                            </li>*@
+                            @*<li class="divider"></li>*@
+                            <li>
+                                <a href="/Auth/Logout"><i class="fa fa-fw fa-power-off"></i> Logga ut</a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li><a href="/Auth/Login">Logga in</a></li>
+                }
+            </ul>   
+            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav side-nav">
+                    @if (_auth.HasAdminPermission()) 
+                    {
+                        <li>
+                            <a href="/User/GetAcountInfo"><i class="fa fa-user"></i> Mitt Konto</a>
+                        </li>
+                        <li>
+                            <a href="/User/"><i class="fa fa-book"></i> Mina Lån</a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="javascript:;" data-toggle="collapse" data-target="#author"><i class="fa fa-user"></i> Författare <i class="fa fa-fw fa-caret-down"></i></a>
+                            <ul id="author" class="collapse">
+                                <li>
+                                    <a href="/AuthorAdmin">Alla författare</a>
+                                </li>
+                                <li>
+                                    <a href="/AuthorAdmin/Create">Skapa författare</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="javascript:;" data-toggle="collapse" data-target="#borrower"><i class="fa fa-wheelchair"></i> Låntagare <i class="fa fa-fw fa-caret-down"></i></a>
+                            <ul id="borrower" class="collapse">
+                                <li>
+                                    <a href="/BorrowerAdmin">Alla låntagare</a>
+                                </li>
+                                <li>
+                                    <a href="/BorrowerAdmin/Create">Skapa låntagare</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="javascript:;" data-toggle="collapse" data-target="#book"><i class="fa fa-book"></i> Bok <i class="fa fa-fw fa-caret-down"></i></a>
+                            <ul id="book" class="collapse">
+                                <li>
+                                    <a href="/BookAdmin">Alla böcker</a>
+                                </li>
+                                <li>
+                                    <a href="/BookAdmin/Create">Skapa bok</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="/Auth/Logout"><i class="fa fa-power-off"></i> Logga ut</a>
+                        </li>
+                    }
+                    else if (_auth.HasUserPermission())
+                    {
+                        <li>
+                            <a href="/User/GetAcountInfo"><i class="fa fa-user"></i> Konto</a>
+                        </li>
+                        <li>
+                            <a href="/User/"><i class="fa fa-book"></i> Lån</a>
+                        </li>
+                        <li>
+                            <a href="/Auth/Logout"><i class="fa fa-power-off"></i> Logga ut</a>
+                        </li>
+                    }
+                    else { 
+                        <li>
+                            <a href="/Auth/Login"><i class="fa fa-key"></i> Logga in</a>
+                        </li>
+                    }
+                    
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </nav>
+
+        <div id="page-wrapper">
+
+            <div class="container-fluid">
+                <!-- Views -->
+                    @RenderBody()
+                <!-- /.Views -->
+
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+    <!-- jQuery -->
+    <script src="~/Scripts/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="~/Scripts/bootstrap.min.js"></script>
+
+    <!-- Morris Charts JavaScript -->
+    <script src="~/Scripts/plugins/morris/raphael.min.js"></script>
+    <script src="~/Scripts/plugins/morris/morris.min.js"></script>
+
+    <!-- ParsleyJs Validation Javascript -->
+    @*<script src="~/Scripts/parsley.min.js"></script>
+    <script src="~/Scripts/parsley-sv.js"></script>*@
+    <!-- Custom scripts -->
+    @RenderSection("Scripts", false)
+</body>
+
+</html>

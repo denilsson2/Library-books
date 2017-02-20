@@ -1,0 +1,26 @@
+﻿@model Common.Model.LettersAndBooks
+@{
+    ViewBag.Title = "Start";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            Böcker <small><label class="label label-warning">Administratorläge</label></small>
+            <a href="/BookAdmin/Create" class="btn btn-default pull-right">Skapa ny bok</a>
+        </h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        @if (TempData["Alert"] != null)
+        {
+            @Html.Raw(TempData["Alert"])
+        }
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        @Html.Raw(Model.Render("/BookAdmin/?letter=", "/BookAdmin/Book/", "ISBN", new string[] {"Title"}))
+    </div>
+</div>

@@ -1,0 +1,9 @@
+﻿@model Common.Model.LettersAndAuthors
+@{
+    ViewBag.Title = "Bläddra";
+}
+
+<h2>Bläddra bland alla författare</h2>
+<div class="col-md-8 col-md-offset-2">
+    @Html.Raw(Model.Render("/Public/BrowseAuthor/?letter=", "/Author/GetAuthor/?aid=", "Aid", new string[] { "LastName", "FirstName" }))
+</div>

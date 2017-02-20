@@ -1,0 +1,59 @@
+﻿@model Common.Model.AuthorsAndBooks
+
+@{
+    ViewBag.Title = "Search";
+}
+
+<h2><a href="javascript:void(0);" onclick="history.go(-1);">Sökresultat</a></h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="jumbotron">
+            
+            <h4><b>Böcker som matchar din sökning</b></h4>
+            <table class="table table-hover">
+                
+                <tbody>
+                    @foreach (var book in Model.Books)
+                    {
+                        <tr>
+                            <td><a href="/Book/GetBook/?ISBN=@book.ISBN">@book.Title</a></td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+        <form class="nav" method="get" action="/Public/Start">
+            <div class="form-inline">
+                <input class="btn btn-default" value="Tillbaka" type="submit" />
+            </div>
+        </form>
+    </div>
+        <div class="col-md-6">
+            <div class="jumbotron">
+                <h4><b>Författare som matchar din sökning</b></h4>
+                <table class="table table-hover">
+                    
+                    <tbody>
+                        
+                        @foreach (var author in Model.Authors)
+                        {
+                            <tr>                                
+                                    <td><a href="/Author/GetAuthor/?Aid=@author.Aid">@author.FirstName @author.LastName</a></td>                        
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>             
+    </div>
+</div>
+<div>
+        @*<form class="nav" method="get" action="/Public/Start">
+            <div class="form-inline">
+                <input class="btn btn-default" value="Tillbaka" type="submit" />
+            </div>
+        </form>*@
+</div>
+@*</div>*@
+

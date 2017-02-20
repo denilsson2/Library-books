@@ -1,0 +1,33 @@
+﻿<div ng-controller="ResultsController" style="padding:10px;">
+    <div style="padding:15px;">
+        <img border="0" alt="" style="margin:auto; max-height:300px;" src="http://localhost:49327/bilder/Murvas.png" class="img-responsive">
+    </div>
+    <form>
+        <div class="form-group">
+            <input type="text" class="form-control" ng-model="search_field" placeholder="ex Harry Potter och Hemligheternas Kammare ..." />
+        </div>
+        <button class="btn btn-primary btn-lg btn-block" ng-click="search(search_field)">Sök efter bok</button>
+    </form>
+    <div ng-hide="result == null">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ISBN</th>
+                    <th>Boktitel</th>
+                </tr>
+            </thead>
+            <tbody ng-repeat="item in result">
+                <tr>
+                    <td>{{ item.ISBN }}</td>
+                    <td><a href="http://localhost:49327/Book/GetBook/?ISBN={{ item.ISBN }}" target="_blank">{{ item.Title }}</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div ng-show="loading" class="text-center" style="padding:15px;">
+        <i class="fa fa-spinner fa-spin fa-2x"></i>
+    </div>
+    <div ng-show="errormessage">
+        <div class="alert alert-danger" role="alert"><b>{{ errormessage }}</b> {{ errorcode }}</div>
+    </div>
+</div>

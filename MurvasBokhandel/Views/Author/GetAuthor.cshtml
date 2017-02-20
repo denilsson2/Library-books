@@ -1,0 +1,43 @@
+﻿@model Common.Model.AuthorWithBooks
+
+@{
+    ViewBag.Title = "GetAuthor";
+}
+
+<h2 class="alert-danger">Författare</h2>
+<h2>@Model.Author.FirstName @Model.Author.LastName</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-hover">
+            <thead class="alert-info">
+                <tr>
+                    <th>Titel</th>
+                    <th>ISBN</th>
+                    <th>Publikationsår</th>
+                    <th>PublikationsInformation</th>
+                    <th>Antal sidor</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var book in Model.Books)
+                {
+                    <tr>
+                        <td><a href="/Book/GetBook/?ISBN=@book.ISBN">@book.Title</a></td>
+                        <td><a href="/Book/GetBook/?ISBN=@book.ISBN">@book.ISBN</a></td>
+                        <td>@book.PublicationYear</td>
+                        <td>@book.publicationinfo</td>
+                        <td>@book.pages</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <a href="javascript:void(0);" onclick="history.go(-1);"><input class="btn btn-default" value="Tillbaka" type="submit" /></a>
+        @*<form class="nav"  method="get" action="/Public/Start">
+            <div class="form-inline">                
+                <input class="btn btn-default" value="Tillbaka" type="submit" />
+            </div>
+        </form>*@
+    </div>
+</div>
+

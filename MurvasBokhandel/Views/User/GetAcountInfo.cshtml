@@ -1,0 +1,84 @@
+﻿@model Common.Model.BorrowerWithUser
+@{
+    ViewBag.Title = "Konto";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            @Model.Borrower.FirstName @Model.Borrower.LastName           
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <h4>Dina kontouppgifter</h4>
+</div>
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        @Html.HiddenFor(m => m.User.PersonId)
+        @Html.HiddenFor(m => m.User.RoleId)
+        @Html.HiddenFor(m => m.Borrower.PersonId)
+        @Html.HiddenFor(m => m.Borrower.CategoryId)
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>Personnummer</label>
+                @Html.EditorFor(m => m.Borrower.PersonId, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
+                @Html.ValidationMessageFor(m => m.Borrower.PersonId, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <label>Förnamn</label>
+                @Html.EditorFor(m => m.Borrower.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(m => m.Borrower.FirstName, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <label>Efternamn</label>
+                @Html.EditorFor(m => m.Borrower.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(m => m.Borrower.LastName, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <label>Adress</label>
+                @Html.EditorFor(m => m.Borrower.Address, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(m => m.Borrower.Address, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>Telefonnummer</label>
+                @Html.EditorFor(m => m.Borrower.Telno, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(m => m.Borrower.Telno, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                @Html.EditorFor(m => m.User.Email, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(m => m.User.Email, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <label>Nuvarande lösenord</label>
+                @Html.PasswordFor(m => m.User.Password, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User.Password, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <label>Nytt lösenord</label>
+                <small>Lämna tomt om du inte vill ändra</small>
+                <input type="password" name="newPassword" class="form-control" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            @if (Model.IsAlerted())
+            {
+                @Html.Raw(Model.PopAlert())
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-md-8">
+            <input type="submit" class="btn btn-warning btn-block" value="Uppdatera" />
+        </div>
+    </div>
+    }

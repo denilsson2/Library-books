@@ -1,0 +1,243 @@
+﻿@model Common.Model.BorrowerWithBorrows
+@{
+    ViewBag.Title = "Borrower";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            @Model.BorrowerWithUser.Borrower.FirstName @Model.BorrowerWithUser.Borrower.LastName - <small><a href="/BorrowerAdmin">Låntagare</a></small>
+            @if (Model.BorrowerWithUser.User.Email != null) { 
+                <font size="5" color="green" style="float:right"> Konto finns</font>
+            }
+        </h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        @if (TempData["Alert"] != null)
+        {
+            @Html.Raw(TempData["Alert"])
+        }
+        @using (Html.BeginForm("Borrower", "BorrowerAdmin", new { @id = "borrower_form" }))
+        {            
+            @Html.HiddenFor(m => m.BorrowerWithUser.Borrower.PersonId)
+            if (Model.BorrowerWithUser.User.Email != null)
+            {
+                <h4>Kontoinformation</h4>
+                @Html.HiddenFor(m => m.BorrowerWithUser.User.PersonId)
+                <div class="form-group">
+                    <label>Email</label>
+                    @Html.TextBoxFor(m => m.BorrowerWithUser.User.Email, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.BorrowerWithUser.User.Email, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group">
+                    <label>Roll</label>
+                    <select name="BorrowerWithUser.User.RoleId" class="form-control">
+                        @{
+                            foreach (var role in @Model.Roles)
+                            {
+                                <option value="@role.Id" @(Model.BorrowerWithUser.User.RoleId == role.Id ? "selected" : "")>@role.Name</option>
+                            }
+                        }
+                        @Html.ValidationMessageFor(m => m.BorrowerWithUser.User.RoleId, "", new { @class = "text-danger" })
+                    </select>
+                </div>
+            <hr />
+            }
+            <h4>Låntagarinformation</h4>
+            <div class="form-group">
+                <label>Personnummer</label>
+                <input type="text" disabled class="form-control" value="@Model.BorrowerWithUser.Borrower.PersonId" />
+                @Html.ValidationMessageFor(m => m.BorrowerWithUser.Borrower.PersonId, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <label>Förnamn</label>
+                @Html.TextBoxFor(m => m.BorrowerWithUser.Borrower.FirstName, new { @class = "form-control", placeholder = "Förnamn" })
+                @Html.ValidationMessageFor(m => m.BorrowerWithUser.Borrower.FirstName, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <label>Efternamn</label>
+                @Html.TextBoxFor(m => m.BorrowerWithUser.Borrower.LastName, new { @class = "form-control", placeholder = "Efternamn", data_parsley_required = "true" })
+                @Html.ValidationMessageFor(m => m.BorrowerWithUser.Borrower.LastName, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <label>Adress</label>
+                @Html.TextBoxFor(m => m.BorrowerWithUser.Borrower.Address, new { @class = "form-control", placeholder = "Adress", data_parsley_required = "true" })
+                @Html.ValidationMessageFor(m => m.BorrowerWithUser.Borrower.Address, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <label>Telefonnummer</label>
+                @Html.TextBoxFor(m => m.BorrowerWithUser.Borrower.Telno, new { @class = "form-control", placeholder = "0000-000000", data_parsley_required = "true" })
+                @Html.ValidationMessageFor(m => m.BorrowerWithUser.Borrower.Telno, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <label>Kategori</label>
+                @Html.DropDownListFor(m => m.BorrowerWithUser.Borrower.CategoryId, new SelectList(Model.Categories, "CatergoryId", "Category"), new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-warning" value="Uppdatera" />
+                <button id="btnRemove" type="button" class="btn btn-danger pull-right" onclick="checkSure()">Ta bort</button>
+            </div>
+            <div class="form-group" style="float:right">
+                <label id="lblSure" style="display: none; margin: 10px">Säker?</label>
+                <button id="btnNo" type="submit" class="btn btn-danger pull-right" onclick="hide()" style="display: none; margin: 10px">Nej</button>
+                <button id="btnYes" type="submit" class="btn btn-danger pull-right" form="form-remove-borrower" style="display: none; margin: 10px">Ja</button>
+            </div>
+
+        }
+
+        @using (Html.BeginForm("Remove", "BorrowerAdmin", FormMethod.Post, new { @id = "form-remove-borrower" }))
+        {
+            @Html.HiddenFor(m => m.BorrowerWithUser.Borrower.PersonId)
+        }
+    </div>
+
+
+@if (Model.BorrowerWithUser.User.Email == null)
+{
+    <div class="col-md-6 jumbotron" style="float:right" id="divAddUser">
+        <h3>Skapa inloggning</h3>
+        <form method="post" action="/BorrowerAdmin/AddUser" id="form-addusertoborrower">
+            <input type="hidden" name="PersonId" class="form-control" value="@Model.BorrowerWithUser.Borrower.PersonId" />
+            <div class="form-group">
+                <label>Personnummer</label>
+                <input type="text" class="form-control" value="@Model.BorrowerWithUser.Borrower.PersonId" disabled />
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="Email" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Lösenord</label>
+                <input type="password" name="Password" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Roll</label>
+                <select name="RoleId" class="form-control">
+                    @{
+                        foreach (var role in @Model.Roles)
+                        {
+                            <option value="@role.Id">@role.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+            <button style="float:right" class="btn btn-primary" form="form-addusertoborrower">Spara</button>
+        </form>
+    </div>
+}
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h4>Lånade böcker</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Titel</th>
+                    <th>Författare</th>
+                    <th>ISBN</th>
+                    <th>Publicerad</th>
+                    <th>Barcode</th>
+                    <th>Lånad den</th>
+                    <th>Förseningsavgift</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <h3>Aktuella</h3>
+                <tbody>
+                    @for (int i = 0; i < Model.Borrows.Active.Count; i++)
+                    {
+                        <form method="post" action="/BorrowerAdmin/RenewLoan/">
+                            <input type="hidden" value="@i" name="index" />
+                            <input type="hidden" value="@Model.Borrows.Active[i].Borrow.Barcode" name="barcode" />
+                            <input type="hidden" value="@Model.Borrows.Active[i].Borrow.PersonId" name="personid" />
+                            <tr>
+                                <td>
+                                    <a href="/Book/GetBook/?isbn=@Model.Borrows.Active[i].Book.ISBN">@Model.Borrows.Active[i].Book.Title</a>
+                                </td>
+                                <td>
+                                    @for (int j = 0; j < Model.Borrows.Active[i].Authors.Count; j++)
+                                    {
+                                        <a href="/Author/GetAuthor/?aid=@Model.Borrows.Active[i].Authors[j].Aid">@Model.Borrows.Active[i].Authors[j].FirstName @Model.Borrows.Active[i].Authors[j].LastName,</a>
+                                    }
+                                </td>
+                                <td>
+                                    <a href="/Book/GetBook/?isbn=@Model.Borrows.Active[i].Book.ISBN">@Model.Borrows.Active[i].Book.ISBN</a>
+                                </td>
+                                <td>@Model.Borrows.Active[i].Book.PublicationYear</td>
+                                <td>@Model.Borrows.Active[i].Borrow.Barcode</td>
+                                <td>@Model.Borrows.Active[i].Borrow.BorrowDate</td>
+                                <td>
+                                    @Model.Borrows.Active[i].Fine:-
+                                    <input name="reloan" value="Låna om" type="submit" style="float: right" class="btn btn-default" />
+                                    @if (Model.Borrows.Active[i].Borrow.ToBeReturnedDate < DateTime.Today)
+                                    {
+                                        <font color="red" style="float:right">Försenad</font>
+                                    }
+                                </td>
+                            </tr>
+                        </form>
+                    }
+                </tbody>
+        </table>
+    </div>
+
+    <div class="col-md-12">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Titel</th>
+                    <th>Författare</th>
+                    <th>ISBN</th>
+                    <th>Publicerad</th>
+                    <th>Barcode</th>
+                    <th>Lånad</th>
+                    <th>Tillbaka lämnad</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <h3>Historik</h3>
+            <tbody>
+                @for (int i = 0; i < Model.Borrows.History.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <a href="/Book/GetBook/?isbn=@Model.Borrows.History[i].Book.ISBN">@Model.Borrows.History[i].Book.Title</a>
+                        </td>
+                        <td>
+                            @for (int j = 0; j < Model.Borrows.History[i].Authors.Count; j++)
+                            {
+                                <a href="/Author/GetAuthor/?aid=@Model.Borrows.History[i].Authors[j].Aid">@Model.Borrows.History[i].Authors[j].FirstName @Model.Borrows.History[i].Authors[j].LastName,</a>
+                            }
+                    </td>
+                    <td>
+                        <a href="/Book/GetBook/?isbn=@Model.Borrows.History[i].Book.ISBN">@Model.Borrows.History[i].Book.ISBN</a>
+                    </td>
+                    <td>@Model.Borrows.History[i].Book.PublicationYear</td>
+                    <td>@Model.Borrows.History[i].Borrow.Barcode</td>
+                    <td>@Model.Borrows.History[i].Borrow.BorrowDate</td>
+                    <td>@Model.Borrows.History[i].Borrow.ReturnDate</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        function checkSure() {
+            document.getElementById('btnRemove').disabled = 'true'
+            document.getElementById('lblSure').style.display = 'block'
+            document.getElementById('btnYes').style.display = 'block'
+            document.getElementById('btnNo').style.display = 'block'
+        }
+        function hide() {
+            document.getElementById('btnRemove').disabled = 'false'
+            document.getElementById('lblSure').style.display = 'none'
+            document.getElementById('btnYes').style.display = 'none'
+            document.getElementById('btnNo').style.display = 'none'
+        }
+    </script>
+}

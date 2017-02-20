@@ -1,0 +1,127 @@
+﻿@model Common.Model.AuthorWithBooksAndBooks
+@{
+    ViewBag.Title = "Author";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            @Model.Author.FirstName @Model.Author.LastName - <small><a href="/AuthorAdmin">Författare</a></small>
+        </h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <h4>Redigera författare</h4>
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.Author.Aid)
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="form-group">
+                    @Html.Label("Förnamn", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Author.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Author.FirstName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.Label("Efternamn", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Author.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Author.LastName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.Label("Födelseår", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Author.BirthYear, new { htmlAttributes = new { @class = "form-control", @type = "number" } })
+                        @Html.ValidationMessageFor(model => model.Author.BirthYear, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Uppdatera" class="btn btn-warning" />
+                        <button type="submit" form="form-remove-author" class="btn btn-danger pull-right">Ta bort</button>
+                    </div>
+                </div>
+            </div>
+        }
+        @using (Html.BeginForm("Remove", "AuthorAdmin", FormMethod.Post, new { @id = "form-remove-author" }))
+        {
+            @Html.HiddenFor(m => m.Author.Aid)
+        }
+
+        @if (TempData["Alert"] != null)
+        {
+            @Html.Raw(TempData["Alert"])
+        }
+    </div>
+    <div class="col-md-6">
+        <h4>Böcker av @Model.Author.FirstName @Model.Author.LastName
+            <button type="button" class="btn btn-default btn-sm pull-right" data-toggle="modal" data-target="#add-book">
+                <i class="fa fa-plus"></i> Lägg till bok på författare
+            </button>
+        </h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ISBN</th>
+                    <th>Titel</th>
+                    <th>Information</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Books.Count != 0)
+                {
+                    foreach (var book in Model.AuthorBooks)
+                    {
+                        <tr>
+                            <td>@book.ISBN</td>
+                            <td><a href="/BookAdmin/Book/@book.ISBN">@book.Title</a></td>
+                            <td>@book.publicationinfo</td>
+                            <td><a href="/AuthorAdmin/RemoveBookFromAuthor?isbn=@book.ISBN&aid=@Model.Author.Aid" class="btn btn-danger btn-xs">Ta bort</a></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <!-- Modal -->
+        <div class="modal fade" id="add-book" tabindex="-1" role="dialog" aria-labelledby="AddBook">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Lägg till en bok</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/AuthorAdmin/AddBookToAuthor" method="post" id="form-addbooktoauthor">
+                            <input type="hidden" name="Aid" value="@Model.Author.Aid" />
+                            <div class="form-group">
+                                <label>Klassifikation</label>
+                                <select name="ISBN" class="form-control">
+                                    @foreach (var book in Model.Books)
+                                    {
+                                        <option value="@book.ISBN">@book.Title</option>
+                                    }
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Stäng</button>
+                        <button class="btn btn-primary" form="form-addbooktoauthor">Spara</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

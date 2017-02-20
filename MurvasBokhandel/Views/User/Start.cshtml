@@ -1,0 +1,138 @@
+﻿@model Common.Model.ActiveAndHistoryBorrows
+@{
+    ViewBag.Title = "Borrow Section";
+}
+
+<h2>Lånade böcker</h2>
+                <tr><h2>Aktiva</h2></tr>
+<div>
+        <table class="table table-striped table-hover">
+            <th class="info">
+                <font size="5">Titel</font>
+            </th>
+            <th class="info">
+                <font size="5">Författare</font>
+            </th>
+            <th class="info">
+                <font size="5">ISBN</font>
+            </th>
+            <th class="info">
+                <font size="5">Barcode</font>
+            </th>
+            <th class="info">
+                <font size="5">Publicerad</font>
+            </th>
+            <th class="info">
+                <font size="5">Lånad</font>
+            </th>
+            <th class="info">
+                <font size="5">Lämnas tillbaka</font>
+            </th>
+            <th class="info">
+                <form action="/User/ReloanAll" method="post">
+                    <font size="5">Förseningsavgift</font>
+                    <input name="reloanAll" @(Model.Active.Count == 0 ? "disabled" : "") value="Låna om alla" type="submit" style="float: right" class="btn btn-info" />
+                </form>
+            </th>
+            <!--TODO: Ändra om till foreach och rätta till kopplingar-->
+            @for (int i = 0; i < Model.Active.Count; i++)
+            {
+                //if (Model.Active[i].Borrow.ReturnDate == null) { 
+                    <form action="/User/Reloan" method="post">
+                    <input type="hidden" value="@i" name="index" />
+                    <tr>
+                        <td>
+                            <a href="/Book/GetBook/?isbn=@Model.Active[i].Book.ISBN">@Model.Active[i].Book.Title</a>
+                        </td>
+                        <td>
+                            @for (int j = 0; j < Model.Active[i].Authors.Count; j++)
+                            { 
+                                <a href="/Author/GetAuthor/?aid=@Model.Active[i].Authors[j].Aid">@Model.Active[i].Authors[j].FirstName @Model.Active[i].Authors[j].LastName,</a>
+                            }
+                        </td>
+                        <td>
+                            <a href="/Book/GetBook/?isbn=@Model.Active[i].Book.ISBN">@Model.Active[i].Book.ISBN</a>
+                        </td>
+                        <td>
+                            @Model.Active[i].Borrow.Barcode
+                        </td>
+                        <td>
+                            @Model.Active[i].Book.PublicationYear
+                        </td>
+                        <td>
+                            @Model.Active[i].Borrow.BorrowDate
+                        </td>
+                        <td>
+                            @Model.Active[i].Borrow.ToBeReturnedDate
+                        </td>
+                        <td>
+                            @Model.Active[i].Fine:-
+                            @if (Model.Active[i].Borrow.ToBeReturnedDate >= DateTime.Today)
+                            { 
+                                <input name="reloan" value="Låna om" type="submit" style="float: right" class="btn btn-default" />
+                            }
+                            else
+                            {
+                                <font color="red" style="float:right">Försenad</font>
+                            }
+                            
+                        </td>
+                    </tr>
+                </form>
+                //}
+            }
+</table>
+    <table class="table table-striped table-hover">
+        <th class="warning">
+            <font size="5">Titel</font>
+        </th>
+        <th class="warning">
+            <font size="5">Författare</font>
+        </th>
+        <th class="warning">
+            <font size="5">ISBN</font>
+        </th>
+        <th class="warning">
+            <font size="5">Barcode</font>
+        </th>
+        <th class="warning">
+            <font size="5">Publicerad</font>
+        </th>
+        <th class="warning">
+            <font size="5">Lånad</font>
+        </th>
+        <th class="warning">
+            <font size="5">Tillbaka lämnad</font>
+        </th>
+        <tr><h2>Historik</h2></tr>
+    @for (int i = 0; i < Model.History.Count; i++)
+    {
+                <tr>
+                    <td>
+                        <a href="/Book/GetBook/?isbn=@Model.History[i].Book.ISBN">@Model.History[i].Book.Title</a>
+                    </td>
+                    <td>
+                        @for (int j = 0; j < Model.History[i].Authors.Count; j++)
+                        {
+                            <a href="/Author/GetAuthor/?aid=@Model.History[i].Authors[j].Aid">@Model.History[i].Authors[j].FirstName @Model.History[i].Authors[j].LastName,</a>
+                        }
+                    </td>
+                    <td>
+                        <a href="/Book/GetBook/?isbn=@Model.History[i].Book.ISBN">@Model.History[i].Book.ISBN</a>
+                    </td>
+                    <td>
+                        @Model.History[i].Borrow.Barcode
+                    </td>
+                    <td>
+                        @Model.History[i].Book.PublicationYear
+                    </td>
+                    <td>
+                        @Model.History[i].Borrow.BorrowDate
+                    </td>
+                    <td>
+                        @Model.History[i].Borrow.ReturnDate
+                    </td>
+                </tr>
+    }
+    </table>
+</div>
